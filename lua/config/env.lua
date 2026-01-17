@@ -7,8 +7,8 @@ local M = {
   -- theme = "catppuccin",
   -- theme = "rose-pine",
   -- theme = "everforest",
-  -- theme = "ayu",
-  theme = "tokyonight",
+  theme = "ayu",
+  -- theme = "tokyonight",
 }
 
 return M
