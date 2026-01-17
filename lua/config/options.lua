@@ -110,3 +110,4 @@ opt.mousemoveevent = true -- 相应悬停事件
 -- 强制使用 .git 作为项目根目录(解决 monorepo 问题)
 -- 将 .git 检测优先级提升到 LSP 之前,避免 LSP 根据 package.json 错误判断根目录
 vim.g.root_spec = { ".git", "lsp", "cwd" }
+vim.g.lazyvim_prettier_needs_config = true
