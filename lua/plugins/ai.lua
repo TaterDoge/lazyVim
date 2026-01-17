@@ -25,6 +25,7 @@ return {
       {
         "MeanderingProgrammer/render-markdown.nvim",
         ft = { "markdown", "codecompanion" },
+        opts = require("config.editor.render-markdown"),
       },
       -- 使用内联助手或 @editor 工具时，使用 mini.diff 获得更清晰的差异
       {
@@ -68,16 +69,16 @@ return {
   {
     "sudo-tee/opencode.nvim",
     config = function()
-      require("opencode").setup({})
+      require("opencode").setup({
+        preferred_picker = "snacks",
+        default_mode = "Sisyphus",
+      })
     end,
     dependencies = {
       "nvim-lua/plenary.nvim",
       {
         "MeanderingProgrammer/render-markdown.nvim",
-        opts = {
-          anti_conceal = { enabled = false },
-          file_types = { "markdown", "opencode_output" },
-        },
+        opts = require("config.editor.render-markdown"),
         ft = { "markdown", "Avante", "copilot-chat", "opencode_output" },
       },
       "saghen/blink.cmp",
@@ -103,7 +104,7 @@ return {
       },
       cli = {
         mux = {
-          enabled = false,
+          enabled = true,
           backend = "zellij",
         },
       },

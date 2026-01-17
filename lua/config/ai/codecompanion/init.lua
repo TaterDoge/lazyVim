@@ -1,17 +1,19 @@
 local M = {}
 
---- @type string # 默认适配器名称，可选值为"siliconflow"或其他支持的适配器
+--- @type string # 默认适配器名称
 -- codeplan
-local defaultAdapters = "codeplan"
+local defaultAdapters = "x-aio"
 local models = {
-  "XAIO-C-4-5-Sonnet",
-  "XAIO-C-4-5-Haiku",
   "XAIO-C-4-5-Opus",
-  "DeepSeek-V3.2",
+  "XAIO-C-4-5-Sonnet",
+  "XAIO-O-G5-2",
+  "XAIO-O-G5-2-Codex",
+  "XAIO-G-3-Pro-Preview",
+  "XAIO-G-3-Flash-Preview",
   "GLM-4.7",
   "MiniMax-M2.1",
 }
-local defaultModel = "XAIO-C-4-5-Sonnet"
+local defaultModel = "XAIO-C-4-5-Opus"
 local secondaryModel = "GLM-4.7"
 
 M.keys = {
@@ -35,24 +37,38 @@ M.config = {
     language = "Chinese",
   },
 
+  display = {
+    chat = {
+      start_in_insert_mode = true, -- 以插入模式打开聊天缓冲区？
+    },
+  },
+
   -- 适配器
   adapters = {
     http = {
       -- codeplan
-      codeplan = function()
+      ["x-aio"] = function()
+        -- openai_compatible
+        -- anthropic
         return require("codecompanion.adapters").extend("anthropic", {
-          name = "codeplan",
-          url = "https://code-api.x-aio.com/anthropic/v1/messages",
+          name = "codeplan-completions",
           -- url = "https://code-api.x-aio.com/v1/chat/completions",
+          url = "https://code-api.x-aio.com/anthropic/v1/messages",
           env = {
             api_key = function()
-              return os.getenv("CODEPLAN_API_KEY")
+              return os.getenv("XAIO_API_KEY")
             end,
           },
           schema = {
             model = {
-              choices = models,
               default = defaultModel,
+              choices = models,
+            },
+            extended_thinking = {
+              default = true,
+            },
+            thinking_budget = {
+              default = 16000,
             },
           },
         })
@@ -65,18 +81,22 @@ M.config = {
     chat = {
       adapter = defaultAdapters,
       variables = {
-        opts = {
-          default_variables = { "mcp:neovim://buffer" },
+        ["buffer"] = {
+          opts = {
+            default_params = "diff", -- all diff
+          },
         },
       },
       tools = {
         opts = {
-          -- default_tools = { "neovim", "memory", "full_stack_dev" },
-          default_tools = { "neovim", "memory" },
+          default_tools = { "full_stack_dev" },
         },
         ["insert_edit_into_file"] = {
           opts = {
-            require_approval_before = false,
+            require_approval_before = {
+              buffer = false,
+              file = false,
+            },
             require_confirmation_after = false,
           },
         },
@@ -89,11 +109,6 @@ M.config = {
         ["create_file"] = {
           opts = {
             require_approval_before = false,
-            require_cmd_approval = false,
-          },
-        },
-        ["file_search"] = {
-          opts = {
             require_cmd_approval = false,
           },
         },
@@ -210,37 +225,15 @@ M.config = {
   },
 }
 
-local context_list = {
-  "#{mcp:neovim://buffer}",
-  "#{mcp:neovim://diagnostics/buffer}",
-}
-
--- Function to insert all stickies after the last "> - " line
-local function insert_stickies(bufnr)
-  bufnr = bufnr or vim.api.nvim_get_current_buf()
-  local line_count = vim.api.nvim_buf_line_count(bufnr)
-  local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
-
-  -- 从后往前查找最后一个包含 "> - " 的行
-  local insert_line = line_count
-  for i = #lines, 1, -1 do
-    if lines[i]:match("^>%s*%-%s") then
-      -- 找到最后一个 "> - " 行,在其下方第二行插入(即跳过一行)
-      insert_line = i + 1
-      break
-    end
-  end
-
-  vim.api.nvim_buf_set_lines(bufnr, insert_line, insert_line, false, context_list)
-end
-
-local group = vim.api.nvim_create_augroup("CodeCompanionAutoVariables", {})
-
 vim.api.nvim_create_autocmd("User", {
   pattern = "CodeCompanionChatCreated",
-  group = group,
-  callback = function(request)
-    insert_stickies(request.buf)
+  callback = function(event)
+    local chat = require("codecompanion").buf_get_chat(event.data.bufnr)
+    if chat then
+      -- Insert #buffer at the end of the chat buffer
+      local line_count = vim.api.nvim_buf_line_count(event.data.bufnr)
+      vim.api.nvim_buf_set_lines(event.data.bufnr, line_count, line_count, false, { "", "#{buffer}", "" })
+    end
   end,
 })
 
