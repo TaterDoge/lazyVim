@@ -3,18 +3,20 @@ local M = {}
 --- @type string # 默认适配器名称
 -- codeplan
 local defaultAdapters = "x-aio"
+-- local defaultAdapters = "opencode"
 local models = {
-  "XAIO-C-4-5-Opus",
-  "XAIO-C-4-5-Sonnet",
-  "XAIO-O-G5-2",
-  "XAIO-O-G5-2-Codex",
+  "XAIO-C-4-6-Opus",
+  "XAIO-C-4-6-Sonnet",
+  "XAIO-O-G5-3-Codex",
+  "XAIO-O-G5-3-Codex-Spark",
   "XAIO-G-3-Pro-Preview",
   "XAIO-G-3-Flash-Preview",
-  "GLM-4.7",
-  "MiniMax-M2.1",
+  "Kimi-K2.5",
+  "GLM-5",
+  "MiniMax-M2.5",
 }
-local defaultModel = "XAIO-C-4-5-Opus"
-local secondaryModel = "GLM-4.7"
+local defaultModel = "XAIO-C-4-6-Sonnet"
+local secondaryModel = "MiniMax-M2.5"
 
 M.keys = {
   {
@@ -40,6 +42,13 @@ M.config = {
   display = {
     chat = {
       start_in_insert_mode = true, -- 以插入模式打开聊天缓冲区？
+    },
+    diff = {
+      enabled = true,
+      word_highlights = {
+        additions = true,
+        deletions = true,
+      },
     },
   },
 
@@ -89,7 +98,7 @@ M.config = {
       },
       tools = {
         opts = {
-          default_tools = { "full_stack_dev" },
+          default_tools = { "agent" },
         },
         ["insert_edit_into_file"] = {
           opts = {
@@ -100,8 +109,9 @@ M.config = {
             require_confirmation_after = false,
           },
         },
-        ["cmd_runner"] = {
+        ["run_command"] = {
           opts = {
+            allowed_in_yolo_mode = true,
             require_approval_before = false,
             require_cmd_approval = false,
           },
@@ -127,11 +137,59 @@ M.config = {
       },
     },
   },
+
   prompt_library = {
     markdown = {
       dirs = {
         "~/.config/opencode/command",
       },
+    },
+  },
+
+  -- MCP 服务器配置
+  mcp = {
+    servers = {
+      ["tavily-mcp"] = {
+        cmd = { "npx", "-y", "tavily-mcp@latest" },
+        env = {
+          TAVILY_API_KEY = function()
+            return os.getenv("TAVILY_API_KEY")
+          end,
+        },
+      },
+      ["sequential-thinking"] = {
+        cmd = { "npx", "-y", "@modelcontextprotocol/server-sequential-thinking" },
+        tool_overrides = {
+          sequentialthinking = {
+            output = {
+              success = function(self, tools, _, stdout)
+                local output = stdout and stdout[#stdout]
+                local msg = "Sequential thinking: " .. self.args.thought
+                tools.chat:add_tool_output(self, output, msg)
+              end,
+            },
+          },
+        },
+      },
+      ["chrome-devtools"] = {
+        cmd = { "npx", "-y", "chrome-devtools-mcp@latest" },
+      },
+      ["github"] = {
+        cmd = {
+          "docker",
+          "run",
+          "-i",
+          "--rm",
+          "-e",
+          "GITHUB_PERSONAL_ACCESS_TOKEN=" .. (os.getenv("GITHUB_TOKEN") or ""),
+          "-e",
+          "GITHUB_TOOLSETS=all",
+          "ghcr.io/github/github-mcp-server",
+        },
+      },
+    },
+    opts = {
+      default_servers = { "sequential-thinking", "tavily-mcp" },
     },
   },
 
@@ -204,21 +262,6 @@ M.config = {
             format_summary = nil, -- custom function to format generated summary e.g to remove <think/> tags from summary
           },
         },
-      },
-    },
-    mcphub = {
-      callback = "mcphub.extensions.codecompanion",
-      opts = {
-        -- MCP Tools
-        make_tools = true, -- Make individual tools (@server__tool) and server groups (@server) from MCP servers
-        show_server_tools_in_chat = true, -- Show individual tools in chat completion (when make_tools=true)
-        add_mcp_prefix_to_tool_names = false, -- Add mcp__ prefix (e.g `@mcp__github`, `@mcp__neovim__list_issues`)
-        show_result_in_chat = true, -- Show tool results directly in chat buffer
-        format_tool = nil, -- function(tool_name:string, tool: CodeCompanion.Agent.Tool) : string Function to format tool names to show in the chat buffer
-        -- MCP Resources
-        make_vars = true, -- Convert MCP resources to #variables for prompts
-        -- MCP Prompts
-        make_slash_commands = true, -- Add MCP prompts as /slash commands
       },
     },
     spinner = {},

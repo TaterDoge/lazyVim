@@ -32,7 +32,7 @@ return {
 
   {
     "Shatur/neovim-ayu",
-    dir = "~/Project/neovim-ayu",
+    -- dir = "~/Project/neovim-ayu",
     config = function()
       require("ayu").setup({
         mirage = false,

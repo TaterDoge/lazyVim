@@ -7,7 +7,7 @@ return {
     html = { "biome-check" },
     css = { "biome-check" },
     scss = { "prettier" },
-    vue = { "prettier" },
+    vue = { "oxfmt", "prettier" },
     json = { "biome-check" },
     jsonc = { "biome-check" },
     javascript = { "biome-check" },

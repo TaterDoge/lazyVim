@@ -1,4 +1,20 @@
 return {
+  {
+    "folke/sidekick.nvim",
+    keys = require("config.ai.sidekick").keys,
+    opts = {
+      nes = {
+        enabled = false,
+      },
+      cli = {
+        mux = {
+          enabled = false,
+          backend = "zellij",
+        },
+      },
+    },
+  },
+
   -- 代码伴侣 https://codecompanion.olimorris.dev
   {
     "olimorris/codecompanion.nvim",
@@ -68,10 +84,11 @@ return {
 
   {
     "sudo-tee/opencode.nvim",
+    dir = "~/Github/opencode.nvim",
     config = function()
       require("opencode").setup({
         preferred_picker = "snacks",
-        default_mode = "Sisyphus",
+        default_mode = "sisyphus",
       })
     end,
     dependencies = {
@@ -83,31 +100,6 @@ return {
       },
       "saghen/blink.cmp",
       "folke/snacks.nvim",
-    },
-  },
-
-  {
-    "folke/sidekick.nvim",
-    keys = {
-      {
-        "<A-\\>",
-        mode = { "n", "i", "t" },
-        function()
-          require("sidekick.cli").toggle({ name = "opencode", focus = true })
-        end,
-        desc = "切换 OpenCode",
-      },
-    },
-    opts = {
-      nes = {
-        enabled = false,
-      },
-      cli = {
-        mux = {
-          enabled = true,
-          backend = "zellij",
-        },
-      },
     },
   },
 }

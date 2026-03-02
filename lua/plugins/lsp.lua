@@ -14,6 +14,7 @@ return {
         "vue-language-server",
         "css-lsp",
         "css-variables-language-server",
+        "oxlint",
       },
     },
   },
