@@ -9,13 +9,11 @@ local models = {
   "XAIO-C-4-6-Sonnet",
   "XAIO-O-G5-3-Codex",
   "XAIO-O-G5-3-Codex-Spark",
-  "XAIO-G-3-Pro-Preview",
-  "XAIO-G-3-Flash-Preview",
   "Kimi-K2.5",
   "GLM-5",
   "MiniMax-M2.5",
 }
-local defaultModel = "XAIO-C-4-6-Sonnet"
+local defaultModel = "GLM-5"
 local secondaryModel = "MiniMax-M2.5"
 
 M.keys = {
@@ -60,7 +58,7 @@ M.config = {
         -- openai_compatible
         -- anthropic
         return require("codecompanion.adapters").extend("anthropic", {
-          name = "codeplan-completions",
+          name = "x-aio",
           -- url = "https://code-api.x-aio.com/v1/chat/completions",
           url = "https://code-api.x-aio.com/anthropic/v1/messages",
           env = {
@@ -98,7 +96,7 @@ M.config = {
       },
       tools = {
         opts = {
-          default_tools = { "agent" },
+          default_tools = { "agent", "agent_skills" },
         },
         ["insert_edit_into_file"] = {
           opts = {
@@ -171,6 +169,17 @@ M.config = {
           },
         },
       },
+      ["augment-context-engine"] = {
+        cmd = { "auggie", "--mcp", "--mcp-auto-workspace" },
+      },
+      ["filesystem"] = {
+        cmd = {
+          "npx",
+          "-y",
+          "@modelcontextprotocol/server-filesystem",
+          "/Users/maobai",
+        },
+      },
       ["chrome-devtools"] = {
         cmd = { "npx", "-y", "chrome-devtools-mcp@latest" },
       },
@@ -189,7 +198,7 @@ M.config = {
       },
     },
     opts = {
-      default_servers = { "sequential-thinking", "tavily-mcp" },
+      default_servers = { "sequential-thinking", "tavily-mcp", "filesystem" },
     },
   },
 
@@ -265,6 +274,20 @@ M.config = {
       },
     },
     spinner = {},
+    agentskills = {
+      enabled = true,
+      opts = {
+        paths = {
+          "~/.config/opencode/skills",
+        },
+      },
+    },
+    fs_monitor = {
+      enabled = true,
+      opts = {
+        keymap = "gD",
+      },
+    },
   },
 }
 

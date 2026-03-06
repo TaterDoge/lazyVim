@@ -27,6 +27,8 @@ return {
       "nvim-treesitter/nvim-treesitter",
       "ravitemer/mcphub.nvim",
       "ravitemer/codecompanion-history.nvim",
+      "cairijun/codecompanion-agentskills.nvim",
+      "bassamsdata/fs-monitor.nvim",
       "franco-ruggeri/codecompanion-spinner.nvim",
       {
         "j-hui/fidget.nvim",
