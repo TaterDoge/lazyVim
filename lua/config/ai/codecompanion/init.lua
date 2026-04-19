@@ -2,19 +2,19 @@ local M = {}
 
 --- @type string # 默认适配器名称
 -- codeplan
-local defaultAdapters = "x-aio"
+local defaultAdapters = "llm"
 -- local defaultAdapters = "opencode"
 local models = {
-  "XAIO-C-4-6-Opus",
-  "XAIO-C-4-6-Sonnet",
-  "XAIO-O-G5-3-Codex",
-  "XAIO-O-G5-3-Codex-Spark",
-  "Kimi-K2.5",
-  "GLM-5",
-  "MiniMax-M2.5",
+  "gpt-5.4",
+  "gpt-5.4-mini",
+  "claude-opus-4.6",
+  "claude-sonnet-4.6",
+  "kimi-k2.5",
+  "glm-5",
+  "minimax-m2.5",
 }
-local defaultModel = "GLM-5"
-local secondaryModel = "MiniMax-M2.5"
+local defaultModel = "claude-sonnet-4.6"
+local secondaryModel = "gpt-5.4-mini"
 
 M.keys = {
   {
@@ -53,17 +53,16 @@ M.config = {
   -- 适配器
   adapters = {
     http = {
-      -- codeplan
-      ["x-aio"] = function()
+      -- llm
+      ["llm"] = function()
         -- openai_compatible
         -- anthropic
-        return require("codecompanion.adapters").extend("anthropic", {
+        return require("codecompanion.adapters").extend("openai_compatible", {
           name = "x-aio",
-          -- url = "https://code-api.x-aio.com/v1/chat/completions",
-          url = "https://code-api.x-aio.com/anthropic/v1/messages",
+          url = "http://localhost:8090/v1/chat/completions",
           env = {
             api_key = function()
-              return os.getenv("XAIO_API_KEY")
+              return os.getenv("LLM_API_KEY")
             end,
           },
           schema = {
@@ -177,7 +176,7 @@ M.config = {
           "npx",
           "-y",
           "@modelcontextprotocol/server-filesystem",
-          "/Users/maobai",
+          "/Users/taterdoge",
         },
       },
       ["chrome-devtools"] = {

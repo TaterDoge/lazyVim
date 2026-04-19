@@ -1,4 +1,13 @@
 return {
+  {
+    "mrjones2014/smart-splits.nvim",
+    lazy = false,
+    keys = require("config.editor.smart-splits").keys,
+    opts = {
+      multiplexer_integration = "tmux",
+    },
+  },
+
   -- 代码格式化
   {
     "stevearc/conform.nvim",

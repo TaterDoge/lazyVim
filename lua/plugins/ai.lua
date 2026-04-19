@@ -8,8 +8,8 @@ return {
       },
       cli = {
         mux = {
-          enabled = false,
-          backend = "zellij",
+          enabled = true,
+          backend = "tmux",
         },
       },
     },
@@ -18,14 +18,13 @@ return {
   -- 代码伴侣 https://codecompanion.olimorris.dev
   {
     "olimorris/codecompanion.nvim",
-    -- enabled = false,
+    enabled = false,
     lazy = false,
     keys = require("config.ai.codecompanion.init").keys,
     opts = require("config.ai.codecompanion.init").config,
     dependencies = {
-      { "nvim-lua/plenary.nvim", version = false },
+      { "nvim-lua/plenary.nvim" },
       "nvim-treesitter/nvim-treesitter",
-      "ravitemer/mcphub.nvim",
       "ravitemer/codecompanion-history.nvim",
       "cairijun/codecompanion-agentskills.nvim",
       "bassamsdata/fs-monitor.nvim",
@@ -73,24 +72,11 @@ return {
   },
 
   {
-    "ravitemer/mcphub.nvim",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-    },
-    build = "bun add -g mcp-hub@latest",
-    opts = {
-      port = 37373,
-      auto_approve = true,
-    },
-  },
-
-  {
     "sudo-tee/opencode.nvim",
-    dir = "~/Github/opencode.nvim",
     config = function()
       require("opencode").setup({
         preferred_picker = "snacks",
-        default_mode = "sisyphus",
+        default_mode = "BUILD",
       })
     end,
     dependencies = {

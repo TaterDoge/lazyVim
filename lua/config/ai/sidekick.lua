@@ -7,7 +7,8 @@ M.keys = {
   {
     "<A-\\>",
     function()
-      require("sidekick.cli").toggle({ name = "opencode", focus = true })
+      -- require("sidekick.cli").toggle({ name = "opencode", focus = true })
+      require("sidekick.cli").toggle()
     end,
     desc = "Sidekick Toggle",
     mode = { "n", "t", "i", "x" },
@@ -15,7 +16,8 @@ M.keys = {
   {
     "<leader>aa",
     function()
-      require("sidekick.cli").toggle({ name = "opencode", focus = true })
+      -- require("sidekick.cli").toggle({ name = "opencode", focus = true })
+      require("sidekick.cli").toggle()
     end,
     desc = "Sidekick Toggle CLI",
   },
